@@ -1,0 +1,12 @@
+LSB-inator
+test_fileio
+test_rc4
+test_image
+test_lsb
+test_auth
+test_menu
+*.o
+users.dat
+*.key
+*.png
+!original.png

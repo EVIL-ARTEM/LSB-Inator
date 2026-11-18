@@ -1,0 +1,96 @@
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
+#include "menu.h"
+#include "auth.h"
+#include <string>
+#include <stdexcept>
+#include <iostream>
+
+static std::string readLine(const std::string &prompt)
+{
+    while (true)
+    {
+        std::cout << prompt;
+        std::string line;
+        if (!std::getline(std::cin, line))
+        {
+            throw std::runtime_error("Ввод прерван");
+        }
+        if (!line.empty())
+        {
+            return line;
+        }
+        std::cout << "Пустой ввод, попробуйте снова." << std::endl;
+    }
+}
+
+int main()
+{
+#ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+#endif
+    size_t attempts = 0;
+    while (attempts < 3)
+    {
+        std::string userLogin;
+        std::string password;
+        std::cout << "1 - вход, 2 - регистрация, 0 - выход " << std::endl;
+        std::string choice = readLine("Ваш выбор: ");
+        if (choice == "1")
+        {
+            userLogin = readLine("Ваш логин: ");
+            password = readLine("Ваш пароль: ");
+            auto autentification = auth::login(userLogin, password);
+            if (autentification)
+            {
+                menu::start(userLogin);
+                return 0;
+            }
+            else
+            {
+                attempts++;
+                std::cout << "Введен неверный логин или пароль, попыток осталось: " << 3 - attempts << std::endl;
+            }
+        }
+        else if (choice == "2")
+        {
+            std::string loginUser = readLine("Придумайте имя пользователя: ");
+            while (true)
+            {
+                std::string parol = readLine("Придумайте пароль: ");
+                try
+                {
+                    auth::registerUser(loginUser, parol);
+                    std::cout << "Пользователь " << loginUser << " зарегистрирован " << std::endl;
+                    break;
+                }
+                catch (const std::invalid_argument &e)
+                {
+                    std::cout << "Ошибка: " << e.what() << std::endl;
+                }
+                catch (const std::runtime_error &e)
+                {
+                    std::cout << "Ошибка: " << e.what() << std::endl;
+                    break;
+                }
+            }
+        }
+        else if (choice == "0")
+        {
+            return 0;
+        }
+        else
+        {
+            std::cout << "Введите 0, 1 или 2" << std::endl;
+        }
+    }
+    if (attempts == 3)
+    {
+        std::cout << "Превышено число попыток (3) " << std::endl;
+        return 1;
+    }
+    return 0; // for main
+}
