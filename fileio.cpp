@@ -13,10 +13,12 @@ namespace fileio
             throw std::runtime_error("Не удалось открыть файл: " + fileName);
         }
 
+        // узнаём размер файла: прыгаем в конец, запоминаем позицию, возвращаемся
         stream.seekg(0, std::ios::end);
         auto size = stream.tellg();
         stream.seekg(0, std::ios::beg);
 
+        // выделяем вектор нужного размера и читаем в него весь файл
         std::vector<unsigned char> vec(static_cast<size_t>(size));
         stream.read(reinterpret_cast<char *>(vec.data()), size);
         return vec;

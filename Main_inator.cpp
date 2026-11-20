@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <iostream>
 
+// Читает непустую строку с клавиатуры; при закрытом вводе (Ctrl+D) бросает runtime_error
 static std::string readLine(const std::string &prompt)
 {
     while (true)
@@ -25,6 +26,7 @@ static std::string readLine(const std::string &prompt)
         std::cout << "Пустой ввод, попробуйте снова." << std::endl;
     }
 }
+// Заставка: название программы, назначение и автор
 void printSplash()
 {
     std::cout << "==================================================\n"
@@ -37,6 +39,7 @@ void printSplash()
               << "==================================================\n\n";
 }
 
+// Точка входа: заставка, меню входа и регистрации, не более 3 попыток входа
 int main()
 {
 #ifdef _WIN32
@@ -46,6 +49,7 @@ int main()
     printSplash();
     try
     {
+        // Внешний try ловит любые исключения (прерванный ввод, повреждённый users.dat)
         size_t attempts = 0;
         while (attempts < 3)
         {
@@ -57,6 +61,7 @@ int main()
             {
                 userLogin = readLine("Ваш логин: ");
                 password = readLine("Ваш пароль: ");
+                // Сравниваем хэш введённого пароля с сохранённым
                 auto autentification = auth::login(userLogin, password);
                 if (autentification)
                 {
@@ -74,6 +79,7 @@ int main()
                 std::string loginUser = readLine("Придумайте имя пользователя: ");
                 while (true)
                 {
+                    // Пароль спрашиваем, пока он не пройдёт проверку
                     std::string parol = readLine("Придумайте пароль: ");
                     try
                     {
@@ -81,10 +87,12 @@ int main()
                         std::cout << "Пользователь " << loginUser << " зарегистрирован " << std::endl;
                         break;
                     }
+                    // Неверный логин или пароль - просим ввести пароль заново
                     catch (const std::invalid_argument &e)
                     {
                         std::cout << "Ошибка: " << e.what() << std::endl;
                     }
+                    // Логин уже занят - возвращаемся в меню входа
                     catch (const std::runtime_error &e)
                     {
                         std::cout << "Ошибка: " << e.what() << std::endl;

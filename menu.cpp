@@ -65,18 +65,20 @@ namespace menu
                text.compare(text.size() - suffix.size(), suffix.size(), suffix) == 0;
     }
 
-    // перевод стороки в вектор
+    // перевод строки в вектор байт
     static std::vector<unsigned char> toBytes(const std::string &text)
     {
         return std::vector<unsigned char>(text.begin(), text.end());
     }
 
-    // перевод вектора в строку
+    // перевод вектора байт в строку
     static std::string toText(const std::vector<unsigned char> &bytes)
     {
         return std::string(bytes.begin(), bytes.end());
     }
 
+    // Получить ключ: с клавиатуры (не короче 8 символов), из файла или сгенерировать
+    // (генерация только при встраивании - при извлечении ключ уже должен быть)
     static std::vector<unsigned char> getKey(const std::string &hint, bool genAllowed)
     {
         while (true)
@@ -128,6 +130,7 @@ namespace menu
             }
         }
     }
+    // Сценарий "спрятать": картинка -> сообщение -> метка STG1 -> ключи -> RC4 -> LSB -> сохранить
     static void embedFlow()
     {
         // 1. картинка
@@ -182,6 +185,7 @@ namespace menu
         std::cout << "Готово, сообщение спрятано в " << outPath << std::endl;
     }
 
+    // Сценарий "извлечь": картинка -> ключи -> LSB -> RC4 -> проверка метки -> вывод
     static void extractFlow()
     {
         // 1. путь к стегокартинке, загрузить
@@ -220,6 +224,7 @@ namespace menu
         }
     }
 
+    // Главное меню: ошибки сценариев ловятся здесь, программа возвращается в меню
     void start(const std::string &userLogin)
     {
         std::cout << "Здравствуйте, " << userLogin << std::endl;

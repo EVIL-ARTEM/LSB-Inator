@@ -7,6 +7,7 @@
 
 namespace image
 {
+    // Конструктор: читаем байты файла и декодируем PNG в RGBA, 8 бит на канал
     Picture::Picture(const std::string &fileName)
     {
         std::vector<unsigned char> fileBytes = fileio::readFile(fileName);
@@ -17,6 +18,7 @@ namespace image
             throw std::runtime_error("Не удалось разобрать PNG " + fileName + ": " + lodepng_error_text(error));
         }
     }
+    // Сохранение: кодируем RGBA в PNG (без потерь) и пишем в файл
     void Picture::save(const std::string &fileName) const
     {
         std::vector<unsigned char> pngBytes;

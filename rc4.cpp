@@ -8,6 +8,7 @@
 namespace rc4
 {
 
+    // KSA: начальная перестановка S, перемешанная ключом
     static std::array<unsigned char, 256> initState(const std::vector<unsigned char> &key)
     {
         if (key.empty())
@@ -15,10 +16,12 @@ namespace rc4
             throw std::invalid_argument("Ключ RC4 не может быть пустым ");
         }
         std::array<unsigned char, 256> S;
+        // S[i] = i
         for (int i = 0; i < 256; i++)
         {
             S[i] = i;
         }
+        // j = (j + S[i] + K[i mod L]) mod 256, обмен S[i] и S[j]
         int j = 0;
         for (int i = 0; i < 256; i++)
         {
@@ -28,6 +31,7 @@ namespace rc4
         return S;
     }
 
+    // PRGA: на каждом шаге получаем байт гаммы и складываем его с данными по XOR
     std::vector<unsigned char> crypt(const std::vector<unsigned char> &data, const std::vector<unsigned char> &key)
     {
         std::array<unsigned char, 256> S = initState(key);
@@ -40,12 +44,14 @@ namespace rc4
             i = (i + 1) % 256;
             j = (j + S[i]) % 256;
             std::swap(S[i], S[j]);
+            // байт гаммы z = S[(S[i] + S[j]) mod 256]
             int gammaByte = S[(S[i] + S[j]) % 256];
             result[k] = data[k] ^ gammaByte;
         }
         return result;
     }
 
+    // Ключ из std::random_device - системного источника случайности
     std::vector<unsigned char> generateKey(size_t length)
     {
         if (length == 0)
